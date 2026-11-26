@@ -1,148 +1,129 @@
- // Reasons database
- const reasons = [
-    { 
-        text: "You’re such a kind and wonderful person, and I feel lucky to share such a good bond with you. 💖", 
-        emoji: "🌟",
-        gif: "gif1.gif"
-    },
-    { 
-        text: "May your day be filled with love, laughter, and endless joy. 🌸 ", 
-        emoji: "💗",
-        gif: "gif2.gif"
-    },
-    { 
-        text: "Wishing you success, happiness, and everything your heart desires. ✨ ", 
-        emoji: "💕",
-        gif: "gif1.gif"
-    },
-    { 
-        text: "Stay the amazing girl you are—always spreading positivity around. Have the happiest year ahead! 🥳 ", 
-        emoji: "🌟",
-        gif: "gif2.gif"
-    }
-];
+(() => {
+    'use strict';
+    const B = window.Birthday;
 
-// State management
-let currentReasonIndex = 0;
-const reasonsContainer = document.getElementById('reasons-container');
-const shuffleButton = document.querySelector('.shuffle-button');
-const reasonCounter = document.querySelector('.reason-counter');
-let isTransitioning = false;
+    const reasons = [
+        {
+            text: "You’re such a kind and wonderful person, and I feel lucky to share such a good bond with you. 💖",
+            emoji: '🌟',
+            gif: 'gif1.gif'
+        },
+        {
+            text: 'May your day be filled with love, laughter, and endless joy. 🌸',
+            emoji: '💗',
+            gif: 'gif2.gif'
+        },
+        {
+            text: 'Wishing you success, happiness, and everything your heart desires. ✨',
+            emoji: '💕',
+            gif: 'gif1.gif'
+        },
+        {
+            text: 'Stay the amazing girl you are—always spreading positivity around. Have the happiest year ahead! 🥳',
+            emoji: '🌟',
+            gif: 'gif2.gif'
+        }
+    ];
 
-// Create reason card with gif
-function createReasonCard(reason) {
-    const card = document.createElement('div');
-    card.className = 'reason-card';
-    
-    const text = document.createElement('div');
-    text.className = 'reason-text';
-    text.innerHTML = `${reason.emoji} ${reason.text}`;
-    
-    const gifOverlay = document.createElement('div');
-    gifOverlay.className = 'gif-overlay';
-    gifOverlay.innerHTML = `<img src="${reason.gif}" alt="Friendship Memory">`;
-    
-    card.appendChild(text);
-    card.appendChild(gifOverlay);
-    
-    gsap.from(card, {
-        opacity: 0,
-        y: 50,
-        duration: 0.5,
-        ease: "back.out"
+    const container = document.getElementById('reasons-container');
+    const button = document.querySelector('.shuffle-button');
+    const counter = document.querySelector('.reason-counter');
+    const dotsBox = document.querySelector('.dots');
+    const ending = document.querySelector('.ending-section');
+
+    let index = 0;
+    let busy = false;
+    let ready = false; // true once every wish is open → button leads to the next page
+
+    // progress dots
+    reasons.forEach(() => {
+        const d = document.createElement('span');
+        d.className = 'dot';
+        dotsBox.appendChild(d);
     });
 
-    return card;
-}
+    function createCard(reason, i) {
+        const card = document.createElement('article');
+        card.className = 'reason-card';
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-pressed', 'false');
 
-// Display new reason
-function displayNewReason() {
-    if (isTransitioning) return;
-    isTransitioning = true;
+        const num = document.createElement('span');
+        num.className = 'reason-num';
+        num.textContent = i + 1;
 
-    if (currentReasonIndex < reasons.length) {
-        const card = createReasonCard(reasons[currentReasonIndex]);
-        reasonsContainer.appendChild(card);
-        
-        // Update counter
-        reasonCounter.textContent = `Reason ${currentReasonIndex + 1} of ${reasons.length}`;
-        
-        currentReasonIndex++;
+        const text = document.createElement('p');
+        text.className = 'reason-text';
+        text.textContent = `${reason.emoji} ${reason.text}`;
 
-        // Check if we should transform the button
-        if (currentReasonIndex === reasons.length) {
-            gsap.to(shuffleButton, {
-                scale: 1.1,
-                duration: 0.5,
-                ease: "elastic.out",
-                onComplete: () => {
-                    shuffleButton.textContent = "Enter Our Storylane 💫";
-                    shuffleButton.classList.add('story-mode');
-                    shuffleButton.addEventListener('click', () => {
-                        gsap.to('body', {
-                            opacity: 0,
-                            duration: 1,
-                            onComplete: () => {
-                                window.location.href = 'last.html'; // Replace with the actual URL of the next page
-                            }
-                        });
-                    });
-                }
-            });
+        const hint = document.createElement('span');
+        hint.className = 'peek-hint';
+        hint.textContent = 'tap to peek 👀';
+
+        const overlay = document.createElement('div');
+        overlay.className = 'gif-overlay';
+        const img = document.createElement('img');
+        img.src = reason.gif;
+        img.alt = 'A cute animated surprise';
+        img.loading = 'lazy';
+        overlay.appendChild(img);
+
+        card.append(num, text, hint, overlay);
+
+        const toggle = () => {
+            const on = card.classList.toggle('peek');
+            card.setAttribute('aria-pressed', String(on));
+            hint.textContent = on ? 'tap to go back' : 'tap to peek 👀';
+        };
+        card.addEventListener('click', toggle);
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggle();
+            }
+        });
+        return card;
+    }
+
+    function showNext(e) {
+        busy = true;
+        const card = createCard(reasons[index], index);
+        container.appendChild(card);
+
+        dotsBox.children[index].classList.add('on');
+        counter.textContent = `Reason ${index + 1} of ${reasons.length}`;
+        index++;
+
+        // bring the new card into view (the sticky button stays reachable)
+        requestAnimationFrame(() =>
+            card.scrollIntoView({ behavior: B.reduce ? 'auto' : 'smooth', block: 'center' })
+        );
+
+        const x = (e && e.clientX) || innerWidth / 2;
+        const y = (e && e.clientY) || innerHeight / 2;
+        B.burst(x, y, ['💖', '✨', '🌸', '🦋', '⭐'], 7);
+
+        if (index === reasons.length) {
+            ready = true;
+            setTimeout(() => {
+                button.textContent = 'Enter Our Storylane 💫';
+                button.classList.add('story-mode');
+                ending.hidden = false;
+                B.burst(innerWidth / 2, innerHeight / 2, ['💖', '🎉', '✨', '🎂', '💕'], 16);
+            }, 700);
         }
 
-        // Create floating elements
-        createFloatingElement();
-        
-        setTimeout(() => {
-            isTransitioning = false;
-        }, 500);
-    } else {
-        // Handle navigation to new page or section
-        window.location.href = "#storylane";
-        // Or trigger your next page functionality
+        setTimeout(() => (busy = false), 500);
     }
-}
 
-// Initialize button click
-shuffleButton.addEventListener('click', () => {
-    gsap.to(shuffleButton, {
-        scale: 0.9,
-        duration: 0.1,
-        yoyo: true,
-        repeat: 1
+    button.addEventListener('click', (e) => {
+        if (ready && button.classList.contains('story-mode')) {
+            B.go('last.html');
+        } else if (!busy && !ready) {
+            showNext(e);
+        }
     });
-    displayNewReason();
-});
 
-// Floating elements function (same as before)
-function createFloatingElement() {
-    const elements = ['🌸', '✨', '💖', '🦋', '⭐'];
-    const element = document.createElement('div');
-    element.className = 'floating';
-    element.textContent = elements[Math.floor(Math.random() * elements.length)];
-    element.style.left = Math.random() * window.innerWidth + 'px';
-    element.style.top = Math.random() * window.innerHeight + 'px';
-    element.style.fontSize = (Math.random() * 20 + 10) + 'px';
-    document.body.appendChild(element);
-
-    gsap.to(element, {
-        y: -500,
-        duration: Math.random() * 10 + 10,
-        opacity: 0,
-        onComplete: () => element.remove()
-    });
-}
-
-// Custom cursor (same as before)
-const cursor = document.querySelector('.custom-cursor');
-document.addEventListener('mousemove', (e) => {
-    gsap.to(cursor, {
-        x: e.clientX - 15,
-        y: e.clientY - 15,
-        duration: 0.2
-    });
-});
-
-// Create initial floating elements
-setInterval(createFloatingElement, 2000);
+    B.startFloaties(['🌸', '✨', '💖', '🦋', '⭐'], 1800);
+})();

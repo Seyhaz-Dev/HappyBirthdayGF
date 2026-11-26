@@ -1,95 +1,39 @@
-// Cursor following effect
-const cursor = document.querySelector('.cursor');
-document.addEventListener('mousemove', (e) => {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
-});
+(() => {
+    'use strict';
+    const B = window.Birthday;
 
-// Typing effect for greeting
-const greetingText = "Hey You Know What! You're the most adorable human i ever met! 💖";
-const greetingElement = document.querySelector('.greeting');
-let charIndex = 0;
+    /* ---- typewriter (emoji-safe: splits by character, not UTF-16 unit) ---- */
+    const text = "Hey You Know What! You're the most adorable human I ever met! 💖";
+    const chars = Array.from(text);
+    const typed = document.querySelector('.typed');
+    const rest = document.querySelector('.rest');
+    const caret = document.querySelector('.caret');
 
-function typeGreeting() {
-    if (charIndex < greetingText.length) {
-        greetingElement.textContent += greetingText.charAt(charIndex);
-        charIndex++;
-        setTimeout(typeGreeting, 100);
+    function render(n) {
+        typed.textContent = chars.slice(0, n).join('');
+        rest.textContent = chars.slice(n).join('');
     }
-}
 
-// Create floating elements
-const floatingElements = ['💖', '✨', '🌸', '💫', '💕'];
-function createFloating() {
-    const element = document.createElement('div');
-    element.className = 'floating';
-    element.textContent = floatingElements[Math.floor(Math.random() * floatingElements.length)];
-    element.style.left = Math.random() * 100 + 'vw';
-    element.style.top = Math.random() * 100 + 'vh';
-    element.style.fontSize = (Math.random() * 20 + 20) + 'px';
-    document.body.appendChild(element);
+    if (B.reduce) {
+        render(chars.length);
+        caret.classList.add('done');
+    } else {
+        render(0);
+        let i = 0;
+        const tick = () => {
+            render(++i);
+            if (i < chars.length) setTimeout(tick, 70);
+            else setTimeout(() => caret.classList.add('done'), 1200);
+        };
+        setTimeout(tick, 900); // start after the title has dropped in
+    }
 
-    gsap.to(element, {
-        y: -500,
-        x: Math.random() * 100 - 50,
-        rotation: Math.random() * 360,
-        duration: Math.random() * 5 + 5,
-        opacity: 1,
-        ease: "none",
-        onComplete: () => element.remove()
+    /* ---- floating emoji ---- */
+    B.startFloaties(['💖', '✨', '🌸', '💫', '💕'], 900);
+
+    /* ---- enter ---- */
+    document.querySelector('.cta').addEventListener('click', (e) => {
+        B.burst(e.clientX || innerWidth / 2, e.clientY || innerHeight / 2, ['💖', '💕', '✨'], 12);
+        B.go('cause.html');
     });
-}
-
-// Initialize animations
-window.addEventListener('load', () => {
-    // Title animation
-    gsap.to('h1', {
-        opacity: 1,
-        duration: 1,
-        y: 20,
-        ease: "bounce.out"
-    });
-
-    // Button animation
-    gsap.to('.cta-button', {
-        opacity: 1,
-        duration: 1,
-        y: -20,
-        ease: "back.out"
-    });
-
-    // Start typing effect
-    typeGreeting();
-
-    // Create floating elements periodically
-    setInterval(createFloating, 1000);
-});
-
-// Hover effects
-       // Hover effects
-       document.querySelectorAll('.cta-button').forEach(button => {
-        button.addEventListener('mouseenter', () => {
-            gsap.to(button, {
-                scale: 1.1,
-                duration: 0.3
-            });
-        });
-
-        button.addEventListener('mouseleave', () => {
-            gsap.to(button, {
-                scale: 1,
-                duration: 0.3
-            });
-        });
-
-        // Smooth page transition on click
-        button.addEventListener('click', () => {
-            gsap.to('body', {
-                opacity: 0,
-                duration: 1,
-                onComplete: () => {
-                    window.location.href = 'cause.html'; // Replace with the actual URL of the next page
-                }
-            });
-        });
-    });
+})();
