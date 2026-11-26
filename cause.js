@@ -2,28 +2,40 @@
     'use strict';
     const B = window.Birthday;
 
-    const reasons = [
+    /* ----- the love notes: edit the text here ----- */
+    const notes = [
         {
-            text: "You’re such a kind and wonderful person, and I feel lucky to share such a good bond with you. 💖",
-            emoji: '🌟',
+            title: 'To my princess 👑',
+            text: 'From the moment you came into my life, everything became a little softer, a little brighter, and so much sweeter. Thank you for being you. 💖',
             gif: 'gif1.gif'
         },
         {
-            text: 'May your day be filled with love, laughter, and endless joy. 🌸',
-            emoji: '💗',
+            title: 'Today is yours 🎂',
+            text: 'The whole world celebrates the day you were born, and I celebrate every single day that I get to have you in mine. 🥰',
             gif: 'gif2.gif'
         },
         {
-            text: 'Wishing you success, happiness, and everything your heart desires. ✨',
-            emoji: '💕',
+            title: 'About your smile 🌸',
+            text: 'Your smile is my favorite place for my heart to rest. Please keep smiling, my princess. It makes my whole day. ✨',
             gif: 'gif1.gif'
         },
         {
-            text: 'Stay the amazing girl you are—always spreading positivity around. Have the happiest year ahead! 🥳',
-            emoji: '🌟',
+            title: 'You are my happy place 🏡',
+            text: 'You are my comfort, my calm, and my favorite person to talk to. Every little moment with you feels like a gift. 💕',
+            gif: 'gif2.gif'
+        },
+        {
+            title: 'My wishes for you 🌟',
+            text: 'I wish you endless laughter, gentle mornings and dreams that come true one by one. And I will be right here, cheering for you. 🌷',
+            gif: 'gif1.gif'
+        },
+        {
+            title: 'Happy Birthday! 🥳',
+            text: 'May this new year love you as much as I do. I am so lucky to be yours, and I promise to keep making you smile. 💝',
             gif: 'gif2.gif'
         }
     ];
+    const signOff = 'Yours, always 💌';
 
     const container = document.getElementById('reasons-container');
     const button = document.querySelector('.shuffle-button');
@@ -33,96 +45,119 @@
 
     let index = 0;
     let busy = false;
-    let ready = false; // true once every wish is open → button leads to the next page
+    let ready = false;
 
-    // progress dots
-    reasons.forEach(() => {
+    notes.forEach(() => {
         const d = document.createElement('span');
         d.className = 'dot';
         dotsBox.appendChild(d);
     });
 
-    function createCard(reason, i) {
-        const card = document.createElement('article');
-        card.className = 'reason-card';
-        card.tabIndex = 0;
-        card.setAttribute('role', 'button');
-        card.setAttribute('aria-pressed', 'false');
+    /* typewriter that never changes the layout (rest of the text stays invisible but takes space) */
+    function typeInto(box, text, speed = 32) {
+        const vis = document.createElement('span');
+        const rest = document.createElement('span');
+        rest.className = 'rest';
+        box.append(vis, rest);
+        const chars = Array.from(text);
+        const paint = (n) => {
+            vis.textContent = chars.slice(0, n).join('');
+            rest.textContent = chars.slice(n).join('');
+        };
+        if (B.reduce) { paint(chars.length); box.classList.add('typed-done'); return; }
+        let i = 0;
+        paint(0);
+        const tick = () => {
+            paint(++i);
+            if (i < chars.length) setTimeout(tick, speed);
+            else box.classList.add('typed-done');
+        };
+        tick();
+    }
 
-        const num = document.createElement('span');
-        num.className = 'reason-num';
-        num.textContent = i + 1;
+    function createNote(n, i) {
+        const card = document.createElement('article');
+        card.className = 'note';
+        card.style.setProperty('--tilt', (i % 2 ? 1.2 : -1.2) + 'deg');
+
+        /* closed envelope */
+        const env = document.createElement('div');
+        env.className = 'env';
+        env.innerHTML = '<div class="flap"></div><div class="seal">💗</div><span class="env-num">' + (i + 1) + '</span>';
+
+        /* the letter (grid trick = smooth height animation) */
+        const body = document.createElement('div');
+        body.className = 'note-body';
+        const paper = document.createElement('div');
+        paper.className = 'paper';
+
+        const title = document.createElement('h2');
+        title.className = 'note-title';
+        title.textContent = n.title;
 
         const text = document.createElement('p');
-        text.className = 'reason-text';
-        text.textContent = `${reason.emoji} ${reason.text}`;
+        text.className = 'note-text';
 
-        const hint = document.createElement('span');
-        hint.className = 'peek-hint';
-        hint.textContent = 'tap to peek 👀';
+        const sign = document.createElement('p');
+        sign.className = 'note-sign';
+        sign.textContent = signOff;
 
-        const overlay = document.createElement('div');
-        overlay.className = 'gif-overlay';
         const img = document.createElement('img');
-        img.src = reason.gif;
+        img.className = 'note-gif';
+        img.src = n.gif;
         img.alt = 'A cute animated surprise';
         img.loading = 'lazy';
-        overlay.appendChild(img);
 
-        card.append(num, text, hint, overlay);
+        paper.append(title, text, sign, img);
+        const inner = document.createElement('div');
+        inner.className = 'paper-wrap';
+        inner.appendChild(paper);
+        body.appendChild(inner);
 
-        const toggle = () => {
-            const on = card.classList.toggle('peek');
-            card.setAttribute('aria-pressed', String(on));
-            hint.textContent = on ? 'tap to go back' : 'tap to peek 👀';
-        };
-        card.addEventListener('click', toggle);
-        card.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggle();
-            }
-        });
+        card.append(env, body);
+
+        // open sequence
+        setTimeout(() => card.classList.add('open'), 650);
+        setTimeout(() => {
+            card.classList.add('gone');
+            typeInto(text, n.text);
+        }, 1250);
         return card;
     }
 
     function showNext(e) {
         busy = true;
-        const card = createCard(reasons[index], index);
+        const card = createNote(notes[index], index);
         container.appendChild(card);
 
         dotsBox.children[index].classList.add('on');
-        counter.textContent = `Reason ${index + 1} of ${reasons.length}`;
+        counter.textContent = 'Note ' + (index + 1) + ' of ' + notes.length;
         index++;
 
-        // bring the new card into view (the sticky button stays reachable)
         requestAnimationFrame(() =>
             card.scrollIntoView({ behavior: B.reduce ? 'auto' : 'smooth', block: 'center' })
         );
+        setTimeout(() => card.scrollIntoView({ behavior: B.reduce ? 'auto' : 'smooth', block: 'center' }), 1500);
 
         const x = (e && e.clientX) || innerWidth / 2;
         const y = (e && e.clientY) || innerHeight / 2;
-        B.burst(x, y, ['💖', '✨', '🌸', '🦋', '⭐'], 7);
+        B.burst(x, y, ['💖', '✨', '💌', '🦋', '🌸'], 8);
 
-        if (index === reasons.length) {
+        if (index === notes.length) {
             ready = true;
             setTimeout(() => {
                 button.textContent = 'Enter Our Storylane 💫';
                 button.classList.add('story-mode');
                 ending.hidden = false;
-                B.burst(innerWidth / 2, innerHeight / 2, ['💖', '🎉', '✨', '🎂', '💕'], 16);
-            }, 700);
+                B.burst(innerWidth / 2, innerHeight / 2, ['💖', '🎉', '✨', '🎂', '💕'], 18);
+            }, 3200);
         }
-
-        setTimeout(() => (busy = false), 500);
+        setTimeout(() => (busy = false), 1300);
     }
 
     button.addEventListener('click', (e) => {
-        if (ready && button.classList.contains('story-mode')) {
-            B.go('last.html');
-        } else if (!busy && !ready) {
-            showNext(e);
-        }
+        if (ready && button.classList.contains('story-mode')) B.go('last.html');
+        else if (!busy && !ready) showNext(e);
     });
 
     B.startFloaties(['🌸', '✨', '💖', '🦋', '⭐'], 1800);

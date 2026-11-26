@@ -56,7 +56,6 @@ main {
     font-weight: 700;
     line-height: 1.1;
     color: var(--pink);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     animation: fadeInScale 1.6s ease backwards;
 }
 
@@ -506,4 +505,66 @@ main {
 
 .polaroid:active {
     scale: 0.97;
+}
+
+
+/* =========================================================
+   Masonry gallery – every photo shown in full, no cropping
+   ========================================================= */
+.memory-container {
+    display: block;
+    column-count: 2;
+    column-gap: var(--gap);
+}
+
+@media (min-width: 560px) { .memory-container { column-count: 3; } }
+@media (min-width: 920px) { .memory-container { column-count: 4; } }
+
+.polaroid {
+    display: block;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    margin-bottom: clamp(1.4rem, 4vw, 2.2rem);
+}
+
+.polaroid .memory-img {
+    aspect-ratio: var(--ar, 4 / 5);
+    height: auto;
+    object-fit: cover;
+}
+
+.polaroid .img-btn {
+    line-height: 0;
+}
+
+/* glossy shine + glow while hovering */
+.polaroid .img-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%);
+    translate: -110% 0;
+    transition: translate 0.8s ease;
+    pointer-events: none;
+}
+
+.polaroid .img-btn {
+    position: relative;
+}
+
+@media (hover: hover) {
+    .polaroid:hover {
+        transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+        transition: rotate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s;
+    }
+
+    .polaroid:hover .img-btn::after {
+        translate: 110% 0;
+    }
+}
+
+.lb-cap {
+    max-width: 38rem;
+    font-size: clamp(1.1rem, 3.4vw, 1.5rem);
+    line-height: 1.3;
 }

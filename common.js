@@ -19,6 +19,13 @@
     fx.setAttribute('aria-hidden', 'true');
     document.body.prepend(fx);
 
+    /* soft aurora blobs behind everything */
+    const aurora = document.createElement('div');
+    aurora.className = 'aurora';
+    aurora.setAttribute('aria-hidden', 'true');
+    aurora.innerHTML = '<i></i><i></i><i></i>';
+    document.body.prepend(aurora);
+
     function floaty(list = EMOJI) {
         if (reduce || document.hidden) return;
         if (fx.childElementCount > (small() ? 10 : 20)) return;
@@ -87,6 +94,23 @@
             ty = e.clientY;
             c.classList.add('on');
             if (!raf) raf = requestAnimationFrame(loop);
+        });
+        // little sparkle trail
+        let lastTrail = 0;
+        addEventListener('pointermove', (e) => {
+            if (reduce || e.pointerType !== 'mouse') return;
+            const now = performance.now();
+            if (now - lastTrail < 70) return;
+            lastTrail = now;
+            const t = document.createElement('span');
+            t.className = 'trail';
+            t.textContent = pick(['✨', '💖', '✦', '💕']);
+            t.style.fontSize = rand(10, 16) + 'px';
+            t.style.setProperty('--x', e.clientX + 'px');
+            t.style.setProperty('--y', e.clientY + 'px');
+            t.style.setProperty('--dx', rand(-14, 14) + 'px');
+            document.body.appendChild(t);
+            t.addEventListener('animationend', () => t.remove());
         });
         document.addEventListener('pointerover', (e) => {
             c.classList.toggle('big', !!e.target.closest('a, button, [role="button"], [data-hover]'));

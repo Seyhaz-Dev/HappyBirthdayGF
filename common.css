@@ -1,6 +1,10 @@
+
 /* =========================================================
    Shared styles – tokens, background, buttons, effects
    ========================================================= */
+
+/* ---------- Colors, fonts, and shared settings ---------- */
+
 :root {
     --pink: #ff69b4;
     --pink-soft: #ff99cc;
@@ -8,12 +12,17 @@
     --purple: #8a2be2;
     --ink: #4a3a4f;
     --card: rgba(255, 255, 255, 0.88);
-    --font-display: 'Dancing Script', 'Bubblegum Sans', cursive;
-    --font-body: 'Quicksand', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+
+    /* Clean and modern font */
+    --font-display: 'Poppins', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+
     --radius: 22px;
     --pad: clamp(1rem, 4.5vw, 2rem);
     --ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ---------- Reset ---------- */
 
 *,
 *::before,
@@ -32,16 +41,37 @@ html {
 body {
     min-height: 100vh;
     min-height: 100dvh;
+
     font-family: var(--font-body);
-    line-height: 1.55;
+    font-size: 16px;
+    line-height: 1.65;
+    font-weight: 400;
+
     color: var(--ink);
-    background: linear-gradient(-45deg, #ffe6f1, #e8ecff, #fff0e6, #f0ffe8);
+
+    background: linear-gradient(
+        -45deg,
+        #ffe6f1,
+        #e8ecff,
+        #fff0e6,
+        #f0ffe8
+    );
+
     background-size: 400% 400%;
-    animation: gradientBG 18s ease infinite, pageIn 0.7s ease backwards;
+
+    animation:
+        gradientBG 18s ease infinite,
+        pageIn 0.7s ease backwards;
+
     overflow-x: hidden;
-    /* keep content clear of notches / rounded corners */
+
+    /* Keep content clear of notches and rounded corners */
     padding:
-        env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        env(safe-area-inset-top)
+        env(safe-area-inset-right)
+        env(safe-area-inset-bottom)
+        env(safe-area-inset-left);
+
     transition: opacity 0.55s ease;
 }
 
@@ -55,7 +85,11 @@ img {
 }
 
 h1,
-h2 {
+h2,
+h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.3;
     text-wrap: balance;
 }
 
@@ -64,27 +98,50 @@ p {
 }
 
 /* ---------- Button ---------- */
+
 .btn {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5em;
+
     min-height: 52px;
     max-width: 100%;
+
     padding: 0.85rem clamp(1.25rem, 5vw, 2.2rem);
+
     border: 0;
     border-radius: 999px;
-    font: inherit;
-    font-weight: 700;
+
+    font-family: inherit;
+    font-weight: 600;
     font-size: clamp(1rem, 0.94rem + 0.35vw, 1.2rem);
     line-height: 1.25;
+
     text-align: center;
     text-decoration: none;
+
     color: #fff;
-    background: linear-gradient(45deg, var(--pink), var(--pink-soft));
+
+    background: linear-gradient(
+        45deg,
+        var(--pink),
+        var(--pink-soft)
+    );
+
     box-shadow: 0 6px 18px rgba(255, 105, 180, 0.4);
+
     cursor: pointer;
-    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.3s;
+
+    transition:
+        transform 0.25s var(--ease),
+        box-shadow 0.25s var(--ease),
+        background 0.3s;
+
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
 }
@@ -110,6 +167,7 @@ a:focus-visible {
 }
 
 /* ---------- Floating emoji layer ---------- */
+
 .fx {
     position: fixed;
     inset: 0;
@@ -121,9 +179,12 @@ a:focus-visible {
 .floaty {
     position: absolute;
     bottom: -3rem;
+
     line-height: 1;
     opacity: 0;
+
     will-change: transform, opacity;
+
     animation: rise var(--d, 10s) linear forwards;
 }
 
@@ -131,23 +192,31 @@ a:focus-visible {
     position: fixed;
     left: 0;
     top: 0;
+
     line-height: 1;
     pointer-events: none;
     z-index: 50;
+
     will-change: transform, opacity;
+
     animation: burst 0.9s ease-out forwards;
 }
 
 /* ---------- Custom cursor (mouse only) ---------- */
+
 .cursor {
     position: fixed;
     left: 0;
     top: 0;
+
     width: 28px;
     height: 28px;
+
     margin: -14px 0 0 -14px;
+
     pointer-events: none;
     z-index: 9999;
+
     opacity: 0;
     transition: opacity 0.2s;
 }
@@ -159,7 +228,11 @@ a:focus-visible {
 .cursor svg {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0 0 5px rgba(255, 105, 180, 0.6));
+
+    filter: drop-shadow(
+        0 0 5px rgba(255, 105, 180, 0.6)
+    );
+
     transition: transform 0.2s var(--ease);
 }
 
@@ -173,44 +246,93 @@ a:focus-visible {
 }
 
 /* ---------- Keyframes ---------- */
+
 @keyframes gradientBG {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 @keyframes pageIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes rise {
-    0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
-    10%  { opacity: 0.9; }
-    90%  { opacity: 0.9; }
+    0% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.9;
+    }
+
+    90% {
+        opacity: 0.9;
+    }
+
     100% {
-        transform: translate3d(var(--x, 0), calc(-100vh - 6rem), 0) rotate(var(--r, 180deg));
+        transform:
+            translate3d(
+                var(--x, 0),
+                calc(-100vh - 6rem),
+                0
+            )
+            rotate(var(--r, 180deg));
+
         opacity: 0;
     }
 }
 
 @keyframes burst {
     0% {
-        transform: translate(var(--x), var(--y)) scale(0.4);
+        transform:
+            translate(var(--x), var(--y))
+            scale(0.4);
+
         opacity: 1;
     }
+
     100% {
-        transform: translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) scale(1.25);
+        transform:
+            translate(
+                calc(var(--x) + var(--dx)),
+                calc(var(--y) + var(--dy))
+            )
+            scale(1.25);
+
         opacity: 0;
     }
 }
 
 @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-/* ---------- Respect "reduce motion" ---------- */
+/* ---------- Respect reduced motion ---------- */
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -223,5 +345,181 @@ a:focus-visible {
 
     .fx {
         display: none;
+    }
+}
+
+/* =========================================================
+   Cool layer: aurora, shine, gradient text, trail
+   ========================================================= */
+
+/* ---------- Aurora background ---------- */
+
+.aurora {
+    position: fixed;
+    inset: 0;
+
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.aurora i {
+    position: absolute;
+
+    width: min(60vw, 520px);
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.55;
+
+    will-change: transform;
+
+    animation: drift 24s ease-in-out infinite alternate;
+}
+
+.aurora i:nth-child(1) {
+    background: #ff9ccf;
+    top: -12%;
+    left: -12%;
+}
+
+.aurora i:nth-child(2) {
+    background: #b9a4ff;
+    bottom: -16%;
+    right: -12%;
+
+    animation-duration: 30s;
+}
+
+.aurora i:nth-child(3) {
+    background: #ffd6a5;
+    top: 38%;
+    left: 42%;
+
+    width: min(40vw, 340px);
+    opacity: 0.4;
+
+    animation-duration: 36s;
+}
+
+@keyframes drift {
+    to {
+        transform: translate3d(8vw, 6vh, 0) scale(1.18);
+    }
+}
+
+/* ---------- Light sweep across buttons ---------- */
+
+.btn::before {
+    content: '';
+
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    background: linear-gradient(
+        110deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.6) 50%,
+        transparent 70%
+    );
+
+    translate: -120% 0;
+
+    animation: shine 3.8s ease-in-out 1.5s infinite;
+}
+
+@keyframes shine {
+    0% {
+        translate: -120% 0;
+    }
+
+    40%,
+    100% {
+        translate: 120% 0;
+    }
+}
+
+/* ---------- Gradient headline ---------- */
+
+.grad-text {
+    background: linear-gradient(
+        90deg,
+        #ff4f9a,
+        #b57bff,
+        #ff7eb6,
+        #ff4f9a
+    );
+
+    background-size: 250% 100%;
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+
+    animation: shimmer 7s linear infinite;
+
+    filter: drop-shadow(
+        0 4px 12px rgba(255, 105, 180, 0.35)
+    );
+}
+
+@keyframes shimmer {
+    to {
+        background-position: -250% 0;
+    }
+}
+
+/* ---------- Sparkle trail behind the mouse ---------- */
+
+.trail {
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    line-height: 1;
+    pointer-events: none;
+    z-index: 9998;
+
+    animation: trail 0.85s ease-out forwards;
+}
+
+@keyframes trail {
+    from {
+        transform:
+            translate(var(--x), var(--y))
+            scale(1);
+
+        opacity: 0.9;
+    }
+
+    to {
+        transform:
+            translate(
+                calc(var(--x) + var(--dx)),
+                calc(var(--y) + 26px)
+            )
+            scale(0.3);
+
+        opacity: 0;
+    }
+}
+
+/* ---------- Reduced motion for cool effects ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .aurora i {
+        animation: none;
+    }
+
+    .btn::before {
+        display: none;
+    }
+
+    .grad-text {
+        animation: none;
     }
 }

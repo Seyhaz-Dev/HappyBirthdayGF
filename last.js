@@ -47,6 +47,11 @@
         img.loading = 'lazy';
         img.decoding = 'async';
         if (p.pos) img.style.setProperty('--pos', p.pos);
+        if (p.w && p.h) {
+            img.width = p.w;
+            img.height = p.h;
+            img.style.setProperty('--ar', p.w + ' / ' + p.h);
+        }
         img.addEventListener('error', () => {
             const ph = document.createElement('div');
             ph.className = 'ph';
@@ -182,6 +187,23 @@
         B.burst(e.clientX, e.clientY, ['💝', '🎉', '💖', '🎂', '✨'], 14);
     });
 
+    /* ---- 3D tilt on hover (mouse only) ---- */
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches && !B.reduce) {
+        document.querySelectorAll('.polaroid').forEach((card) => {
+            card.addEventListener('pointermove', (e) => {
+                const r = card.getBoundingClientRect();
+                const px = (e.clientX - r.left) / r.width - 0.5;
+                const py = (e.clientY - r.top) / r.height - 0.5;
+                card.style.setProperty('--ry', (px * 14).toFixed(1) + 'deg');
+                card.style.setProperty('--rx', (-py * 14).toFixed(1) + 'deg');
+            });
+            card.addEventListener('pointerleave', () => {
+                card.style.removeProperty('--rx');
+                card.style.removeProperty('--ry');
+            });
+        });
+    }
+
     /* ---- lightbox ---- */
     const dlg = document.querySelector('.lightbox');
     const lbImg = dlg.querySelector('.lb-img');
@@ -198,7 +220,8 @@
         if (!img) return;
         lbImg.src = img.currentSrc || img.src;
         lbImg.alt = img.alt;
-        lbCap.textContent = cards[cur].querySelector('.memory-date').textContent;
+        const capEl = cards[cur].querySelector('.memory-caption');
+        lbCap.textContent = cards[cur].querySelector('.memory-date').textContent + (capEl ? '  ·  ' + capEl.textContent : '');
     }
 
     cards.forEach((card, i) => {

@@ -30,9 +30,9 @@ Built with plain **HTML, CSS and JavaScript** – no frameworks, no build step, 
 4. Replace `d1.jpg`, `d2.jpg`, `d3.jpg` (and `gif1.gif`, `gif2.gif`) with your own photos and update the captions in `last.html`.
    Tip: adjust `--pos` on each `<img>` (e.g. `50% 20%`) to choose which part of the photo stays visible on narrow screens.
 
-## 🖼️ Adding your 22 photos
-Put your pictures in the `photos/` folder named `photo04.jpg` … `photo22.jpg` (photos 1–3 are `d1`–`d3`),
-or edit the list in `photos.js` to change file names, titles and captions. Missing photos show a cute placeholder.
+## 🖼️ Photos & love notes
+- Gallery photos live in `photos/` and are listed in `photos.js` (title, caption, size). Photos are shown in full, never cropped.
+- The sweet notes that open from the envelope are in the `notes` list at the top of `cause.js`.
 
 ## 🎉 How to Use
 ```bash
